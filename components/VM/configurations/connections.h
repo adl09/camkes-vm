@@ -83,13 +83,20 @@
  *_global_endpoint refers to the notification object of the other vm
  *_badge refers to the badge that the other vm will receive on its notification object
  */
+/*  
+before
+vm##base_id.ether_##target_id##_send_shmem_size = 32768; \
+vm##base_id.ether_##target_id##_recv_shmem_size = 32768; \
+    
+    */
+
 #define __CONFIG_PER_CONNECTION(base_id, target_id, idx) \
     vm##base_id.ether_##target_id##_send_id = idx *2; \
     vm##base_id.ether_##target_id##_send_attributes = VAR_STRINGIZE(base_id##target_id); \
     vm##base_id.ether_##target_id##_recv_id = idx *2 + 1; \
     vm##base_id.ether_##target_id##_recv_attributes = VAR_STRINGIZE(target_id##base_id); \
-    vm##base_id.ether_##target_id##_send_shmem_size = 32768; \
-    vm##base_id.ether_##target_id##_recv_shmem_size = 32768; \
+    vm##base_id.ether_##target_id##_send_shmem_size = 32768*16; \
+    vm##base_id.ether_##target_id##_recv_shmem_size = 32768*16; \
 
 // Add macaddress to virtqueue mapping. Called per connection per vm
 #define __ADD_MACADDR_MAPPING(base_id, vm_id, idx) \
@@ -145,7 +152,8 @@
 
 #define VM_CONNECTION_CONFIG(to_end, topology) \
     topology(__CONFIG_EXPAND_PERVM) \
-    to_end##_topology = [topology(__CONFIG_EXPAND_TOPOLOGY)];
+    to_end##_topology = [topology(__CONFIG_EXPAND_TOPOLOGY)]; \
+    topology##_conn.queue_length = 256 * 32; // added
 
 #define __INIT_ADD_INTERFACE_END(base_id, target_id) \
     {"init":"make_virtio_net_vswitch_driver_dummy", "badge":"ether_" # target_id "_send_notification_badge()", "irq":"virtio_net_notify_vswitch"}, \
