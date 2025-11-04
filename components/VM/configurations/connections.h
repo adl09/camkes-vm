@@ -88,8 +88,8 @@
     vm##base_id.ether_##target_id##_send_attributes = VAR_STRINGIZE(base_id##target_id); \
     vm##base_id.ether_##target_id##_recv_id = idx *2 + 1; \
     vm##base_id.ether_##target_id##_recv_attributes = VAR_STRINGIZE(target_id##base_id); \
-    vm##base_id.ether_##target_id##_send_shmem_size = 32768*32; \
-    vm##base_id.ether_##target_id##_recv_shmem_size = 32768*32;
+    vm##base_id.ether_##target_id##_send_shmem_size = 32768*32*8; \
+    vm##base_id.ether_##target_id##_recv_shmem_size = 32768*32*8;
 
 // Add macaddress to virtqueue mapping. Called per connection per vm
 #define __ADD_MACADDR_MAPPING(base_id, vm_id, idx) \
@@ -146,7 +146,7 @@
 #define VM_CONNECTION_CONFIG(to_end, topology) \
     topology(__CONFIG_EXPAND_PERVM) \
     to_end##_topology = [topology(__CONFIG_EXPAND_TOPOLOGY)]; \
-    topology##_conn.queue_length = 256 * 32;
+    topology##_conn.queue_length = 256 * 32 * 4;
 
 
 #define __INIT_ADD_INTERFACE_END(base_id, target_id) \
